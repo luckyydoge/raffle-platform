@@ -1,3 +1,7 @@
 spring:
   application:
     name: raffle-platform
+  datasource:
+    username: raffle_platform
+    password: 123456
+    url: jdbc:mysql://127.0.0.1:13306/raffle_platform_db?serverTimezone=UTC&useSSL=false

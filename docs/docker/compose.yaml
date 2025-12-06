@@ -1,10 +1,38 @@
 services:
   mysql:
-    image: 'mysql:latest'
+    image: mysql:8.4.7 # 推荐使用最新的 LTS 版本
+    container_name: raffle-platform-mysql # 更改容器名以匹配项目
+    # 移除 command: --default-authentication-plugin=mysql_native_password
+    restart: always
     environment:
-      - 'MYSQL_DATABASE=mydatabase'
-      - 'MYSQL_PASSWORD=secret'
-      - 'MYSQL_ROOT_PASSWORD=verysecret'
-      - 'MYSQL_USER=myuser'
+      TZ: Asia/Shanghai
+      # 推荐使用非 root 用户进行应用连接
+      MYSQL_ROOT_PASSWORD: 123456 # 最佳实践：从 .env 文件读取密码
+      MYSQL_DATABASE: raffle_platform_db # 明确创建应用数据库
+      MYSQL_USER: raffle_platform
+      MYSQL_PASSWORD: 123456
+    networks:
+      - raffle-platform-network
     ports:
-      - '3306'
+      - "13306:3306"
+    volumes:
+#      - ./mysql/sql:/docker-entrypoint-initdb.d
+      - raffle-platform-mysql-db-data:/var/lib/mysql
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 1G
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123456" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+networks:
+  raffle-platform-network:
+    driver: bridge
+
+volumes:
+  raffle-platform-mysql-db-data:
