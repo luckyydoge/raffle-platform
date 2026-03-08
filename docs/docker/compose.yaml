@@ -29,6 +29,17 @@ services:
       timeout: 5s
       retries: 5
       start_period: 30s
+  redis:
+    image: docker.io/library/redis:7-alpine
+    container_name: raffle-platform-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    environment:
+      - REDIS_PASSWORD=mysecretpassword  # 自定义变量，部分镜像支持
+    command: [ "redis-server", "--requirepass", "mysecretpassword", "--appendonly", "yes" ]
+    restart: always
 
 networks:
   raffle-platform-network:
@@ -36,3 +47,4 @@ networks:
 
 volumes:
   raffle-platform-mysql-db-data:
+  redis_data:
